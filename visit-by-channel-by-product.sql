@@ -4,7 +4,7 @@ SELECT
        MONTH)) AS Month,
   COALESCE(map.level_1_group,
     'Brand') AS source_group,
-  map.product,
+  map.product as map_product, v1.product as v1_product,
   COUNT(v1._id) AS num_visit
 FROM
   `tvlk-realtime.nrtprod.tvlk_visit` AS v1
@@ -29,4 +29,5 @@ WHERE
 GROUP BY
   1,
   2,
-  3
+  3,
+  4
