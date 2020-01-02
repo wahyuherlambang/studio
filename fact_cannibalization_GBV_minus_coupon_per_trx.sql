@@ -1,4 +1,47 @@
 with
+
+rank_TV as
+(
+  select *,
+  ROW_NUMBER()
+          OVER(
+            PARTITION BY
+              booking_id
+            ORDER BY
+              PARTITIONTIME
+          )
+          AS record_seq
+  from `tvlk-data-multibrand-prod.multibrand_flight.edw_fact_flight_booking_hashed`
+),
+
+distinct_TV as
+(
+  select * from rank_TV
+  where record_seq=1
+),
+
+rank_AI as
+(
+  SELECT rank() over (partition by booking_id order by data_id) as row_no, * FROM `tvlk-realtime.airy.fact_flight_sales`
+),
+
+distinct_AI as
+(
+  select * from rank_AI
+  where row_no = 1
+),
+
+rank_PG as
+(
+  SELECT rank() over (partition by booking_id order by data_id) as row_no, * FROM `tvlk-realtime.pegipegi.flight_sales`
+),
+
+distinct_PG as
+(
+  select * from rank_PG
+  where row_no = 1
+),
+
 conversion_0 AS (
 		SELECT
 			a.conversion_table_id AS conversion_id,
